@@ -41,7 +41,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //time
 
-    const dateLine = new Date('2020-07-18T07:45:00');
+    const dateLine = new Date('2020-08-18T07:45:00');
 
 
     function getTimeRemanding (endTime) {
@@ -91,4 +91,51 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
     setClock ('.timer', dateLine);
+
+    // Modal Window
+
+    const btns = document.querySelectorAll('[data-modal]'),
+          exit = document.querySelector('[data-close]'),
+         modal = document.querySelector('.modal'),
+        openModal = setTimeout(showModal, 5000);
+
+    function showModal () {
+        modal.style = 'display: block;';
+        document.body.style.overflow = 'hidden'; 
+        clearInterval(openModal);
+    }
+    function noneModal () {
+        modal.style = 'display: none;';
+        document.body.style.overflow = '';  
+    }
+
+    btns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            if (e.target) {
+                showModal ();
+            }
+        });
+    });
+    exit.addEventListener('click', (e) => {
+        if (e.target) {
+            noneModal (); 
+        }
+    });
+    modal.addEventListener('click', (e) => {
+        if (e.target == modal) {
+            noneModal (); 
+        }
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.code == 'Escape'&& (modal.style = 'display: block;')) {
+            noneModal ();
+        }
+        
+    });
+    window.addEventListener('scroll', () => {
+        if (document.documentElement.scrollTop == 1500){
+            showModal ();
+        }
+    });
+
 });
