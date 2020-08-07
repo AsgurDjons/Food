@@ -97,7 +97,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const btns = document.querySelectorAll('[data-modal]'),
           exit = document.querySelector('[data-close]'),
          modal = document.querySelector('.modal'),
-        openModal = setTimeout(showModal, 5000);
+        openModal = setTimeout(showModal, 3000);
 
     function showModal () {
         modal.style = 'display: block;';
@@ -132,10 +132,14 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         
     });
-    window.addEventListener('scroll', () => {
-        if (document.documentElement.scrollTop == 1500){
-            showModal ();
-        }
-    });
 
+    function scrollModal() {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.
+            documentElement.scrollHeight) {
+                showModal ();
+                window.removeEventListener('scroll', scrollModal);
+        }
+    }
+    
+    window.addEventListener('scroll', scrollModal);
 });
