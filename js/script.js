@@ -91,13 +91,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const btns = document.querySelectorAll('[data-modal]'),
           exit = document.querySelector('[data-close]'),
-         modal = document.querySelector('.modal');
-        // openModal = setTimeout(showModal, 3000);
+          modal = document.querySelector('.modal'),
+          openModal = setTimeout(showModal, 3000);
 
     function showModal () {
         modal.style = 'display: block;';
         document.body.style.overflow = 'hidden'; 
-        // clearInterval(openModal);
+        clearInterval(openModal);
     }
     function noneModal () {
         modal.style = 'display: none;';
