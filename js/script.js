@@ -1,12 +1,10 @@
 window.addEventListener('DOMContentLoaded', () => {
 
-
     // Tabs
 
     const contents = document.querySelectorAll('.tabcontent'),
         tabs = document.querySelector('.tabheader__items'),
         items = document.querySelectorAll('.tabheader__item');
-
 
     function hideContent () {
         contents.forEach( item => {
@@ -18,7 +16,6 @@ window.addEventListener('DOMContentLoaded', () => {
         });
 
     }
-
     function showContent (i = 0) {
         contents[i].classList.remove('hide');
         contents[i].classList.add('show', 'fade');
@@ -43,7 +40,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const dateLine = new Date('2020-08-18T07:45:00');
 
-
     function getTimeRemanding (endTime) {
         const t = Date.parse(endTime) - Date.parse(new Date()),
             desy = Math.floor(t / (1000 * 60 * 60 * 24)),
@@ -67,7 +63,6 @@ window.addEventListener('DOMContentLoaded', () => {
             return sum;
         }
     }
-
     function setClock (celectir, andTime) {
         let timer = document.querySelector(celectir),
             days = timer.querySelector('#days'),
@@ -96,17 +91,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const btns = document.querySelectorAll('[data-modal]'),
           exit = document.querySelector('[data-close]'),
-         modal = document.querySelector('.modal'),
-        openModal = setTimeout(showModal, 3000);
+         modal = document.querySelector('.modal');
+        // openModal = setTimeout(showModal, 3000);
 
     function showModal () {
         modal.style = 'display: block;';
         document.body.style.overflow = 'hidden'; 
-        clearInterval(openModal);
+        // clearInterval(openModal);
     }
     function noneModal () {
         modal.style = 'display: none;';
         document.body.style.overflow = '';  
+    }
+    function scrollModal() {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.
+            documentElement.scrollHeight) {
+                showModal ();
+                window.removeEventListener('scroll', scrollModal);
+        }
     }
 
     btns.forEach(btn => {
@@ -132,14 +134,65 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         
     });
+    window.addEventListener('scroll', scrollModal);
 
-    function scrollModal() {
-        if (window.pageYOffset + document.documentElement.clientHeight >= document.
-            documentElement.scrollHeight) {
-                showModal ();
-                window.removeEventListener('scroll', scrollModal);
+    //  Class
+
+    class CardItem {
+        constructor (price,src,title, descr, alt, selector) {
+            this.src = src;
+            this.title = title;
+            this.descr = descr;
+            this.alt = alt;
+            this.selector = document.querySelector(selector);
+            this.price = price;
+            this.transfer = 27;
+            this.changeToUAN();
+        }
+        changeToUAN() {
+            this.price = +this.price * this.transfer;
+        }
+        render () {
+            const element = document.createElement('div');
+            element.innerHTML = `
+                <div class="menu__item">
+                    <img src=${this.src} alt=${this.alt}>
+                    <h3 class="menu__item-subtitle">${this.title}</h3>
+                    <div class="menu__item-descr">${this.descr}</div>
+                    <div class="menu__item-divider"></div>
+                    <div class="menu__item-price">
+                        <div class="menu__item-cost">Цена:</div>
+                        <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                    </div>
+                </div>
+            `;
+            this.selector.append(element);
         }
     }
-    
-    window.addEventListener('scroll', scrollModal);
+
+    new CardItem(
+        8,
+        "img/tabs/vegy.jpg",
+        'Меню "Фитнес"',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        "vegy",
+        '.menu .container'
+        ).render();
+    new CardItem(
+        20,
+        "img/tabs/elite.jpg",
+        'Меню “Премиум”',
+        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+        "elite",
+        '.menu .container'
+        ).render();
+    new CardItem(
+        16,
+        "img/tabs/post.jpg",
+        'Меню "Постное"',
+        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+        "post",
+        '.menu .container'
+        ).render();
+
 });
