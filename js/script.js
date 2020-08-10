@@ -139,12 +139,13 @@ window.addEventListener('DOMContentLoaded', () => {
     //  Class
 
     class CardItem {
-        constructor (price,src,title, descr, alt, selector) {
+        constructor (price,src,title, descr, alt, selector, ...clases) {
             this.src = src;
             this.title = title;
             this.descr = descr;
             this.alt = alt;
             this.selector = document.querySelector(selector);
+            this.clases = clases;
             this.price = price;
             this.transfer = 27;
             this.changeToUAN();
@@ -154,16 +155,22 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         render () {
             const element = document.createElement('div');
+
+            if(this.clases.length === 0) {
+                this.clases = 'menu__item';
+                element.classList.add(this.clases);
+            }else{
+                this.clases.forEach( item => element.classList.add(item));
+            }
+            
             element.innerHTML = `
-                <div class="menu__item">
-                    <img src=${this.src} alt=${this.alt}>
-                    <h3 class="menu__item-subtitle">${this.title}</h3>
-                    <div class="menu__item-descr">${this.descr}</div>
-                    <div class="menu__item-divider"></div>
-                    <div class="menu__item-price">
-                        <div class="menu__item-cost">Цена:</div>
-                        <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
-                    </div>
+                <img src=${this.src} alt=${this.alt}>
+                <h3 class="menu__item-subtitle">${this.title}</h3>
+                <div class="menu__item-descr">${this.descr}</div>
+                <div class="menu__item-divider"></div>
+                <div class="menu__item-price">
+                    <div class="menu__item-cost">Цена:</div>
+                    <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
                 </div>
             `;
             this.selector.append(element);
@@ -178,6 +185,7 @@ window.addEventListener('DOMContentLoaded', () => {
         "vegy",
         '.menu .container'
         ).render();
+
     new CardItem(
         20,
         "img/tabs/elite.jpg",
@@ -186,6 +194,7 @@ window.addEventListener('DOMContentLoaded', () => {
         "elite",
         '.menu .container'
         ).render();
+
     new CardItem(
         16,
         "img/tabs/post.jpg",
