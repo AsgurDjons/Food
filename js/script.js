@@ -204,10 +204,9 @@ window.addEventListener('DOMContentLoaded', () => {
         '.menu .container'
         ).render();
 
-
         // Forms
 
-    const forms = document.querySelectorAll('form');
+        const forms = document.querySelectorAll('form');
         const message = {
             loading: 'Загрузка...',
             success: 'Спасибо! Скоро мы с вами свяжемся',
@@ -254,4 +253,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
 });
+
+
