@@ -38,7 +38,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //time
 
-    const dateLine = new Date('2020-08-18T07:45:00');
+    const dateLine = new Date('2020-12-18T07:45:00');
 
     function getTimeRemanding (endTime) {
         const t = Date.parse(endTime) - Date.parse(new Date()),
@@ -91,41 +91,38 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const btns = document.querySelectorAll('[data-modal]'),
           modal = document.querySelector('.modal'),
-          openModal = setTimeout(showModal, 50000);
+          modalTimerId = setTimeout(openModal, 50000);
 
-    function showModal () {
+    function openModal () {
         modal.classList.remove('hide');
         modal.classList.add('show');
         document.body.style.overflow = 'hidden'; 
-        clearInterval(openModal);
+        clearInterval(modalTimerId);
     }
-    function hiddenModal () {
+    function closeModal () {
         modal.classList.add('hide');
         document.body.style.overflow = '';  
     }
     function scrollModal() {
         if (window.pageYOffset + document.documentElement.clientHeight >= document.
             documentElement.scrollHeight) {
-                showModal ();
+                openModal ();
                 window.removeEventListener('scroll', scrollModal);
         }
     }
 
     btns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            if (e.target) {
-                showModal ();
-            }
-        });
+        btn.addEventListener('click', openModal);
     });
+
     modal.addEventListener('click', (e) => {
         if (e.target == modal || e.target.getAttribute('data-close') == '') {
-            hiddenModal (); 
+            closeModal (); 
         }
     });
     document.addEventListener('keydown', (e) => {
         if (e.code == 'Escape'&& (modal.style = 'display: block;')) {
-            hiddenModal ();
+            closeModal ();
         }
         
     });
@@ -134,28 +131,30 @@ window.addEventListener('DOMContentLoaded', () => {
     //  Class
 
     class CardItem {
-        constructor (price,src,title, descr, alt, selector, ...clases) {
+        constructor(src, alt, title, descr, price, parentSelector, ...classes) {
             this.src = src;
+            this.alt = alt;
             this.title = title;
             this.descr = descr;
-            this.alt = alt;
-            this.selector = document.querySelector(selector);
-            this.clases = clases;
             this.price = price;
+            this.classes = classes;
+            this.parent = document.querySelector(parentSelector);
             this.transfer = 27;
-            this.changeToUAN();
+            this.changeToUAH(); 
         }
-        changeToUAN() {
-            this.price = +this.price * this.transfer;
+
+        changeToUAH() {
+            this.price = this.price * this.transfer; 
         }
+        
         render () {
             const element = document.createElement('div');
 
-            if(this.clases.length === 0) {
-                this.clases = 'menu__item';
-                element.classList.add(this.clases);
-            }else{
-                this.clases.forEach( item => element.classList.add(item));
+            if (this.classes.length === 0) {
+                this.classes = "menu__item";
+                element.classList.add(this.classes);
+            } else {
+                this.classes.forEach(className => element.classList.add(className));
             }
             
             element.innerHTML = `
@@ -168,112 +167,104 @@ window.addEventListener('DOMContentLoaded', () => {
                     <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
                 </div>
             `;
-            this.selector.append(element);
+            this.parent.append(element);
         }
     }
 
-    new CardItem(
-        8,
-        "img/tabs/vegy.jpg",
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        "vegy",
-        '.menu .container'
-        ).render();
-
-    new CardItem(
-        20,
-        "img/tabs/elite.jpg",
-        'Меню “Премиум”',
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-        "elite",
-        '.menu .container'
-        ).render();
-
-    new CardItem(
-        16,
-        "img/tabs/post.jpg",
-        'Меню "Постное"',
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-        "post",
-        '.menu .container'
-        ).render();
-
-        // Forms
-
-        const forms = document.querySelectorAll('form');
-        const message = {
-            loading: 'icons/spinner.svg',
-            success: 'Спасибо! Скоро мы с вами свяжемся',
-            failure: 'Что-то пошло не так...'
-        };
-    
-        forms.forEach(item => {
-            postData(item);
+    getResource('http://localhost:3000/menu')
+    .then(data => {
+        data.forEach(({img, altimg, title, descr, price}) => {
+            new CardItem(img, altimg, title, descr, price,".menu .container").render();
         });
+    });
+
+    // Forms
+    const forms = document.querySelectorAll('form');
+    const message = {
+        loading: 'icons/modal/spinner.svg',
+        success: 'Спасибо! Мы скоро с вами свяжемся.',
+        failure: 'Что-то пошло не так...',
+    };
+
+    forms.forEach(item => {
+        bindPostData(item);
+    });
+
+    const  postData = async (url, data) => {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: data
+        });
+        return await res.json();
+    };
     
-    function postData(form) {
+    async function getResource(url) {
+        let res = await fetch(url);
+
+        if (!res.ok) {
+            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+        }
+    
+        return await res.json();
+    }
+
+    function bindPostData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-
-            let statusMessage = document.createElement('img');
-            statusMessage.src = message.loading;
-            statusMessage.style.cssText = `
-            display: block;
-            margin: 0 auto;
-            `;
-
-            form.insertAdjacentElement('afterend', statusMessage);
             
-        
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-            request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            const statusMesage = document.createElement('img');
+            statusMesage.src = message.loading;
+            statusMesage.style.cssText = `display: block; margin: 0 auto;`;
+            form.insertAdjacentElement('afterend', statusMesage);
+
             const formData = new FormData(form);
 
-            const object = {};
-            formData.forEach(function(value, key){
-                object[key] = value;
-            });
-            const json = JSON.stringify(object);
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-            request.send(json);
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
-
-                    modalThanks(message.success);
-                    form.reset();
-                    statusMessage.remove();
-                } else {
-                    modalThanks(message.failure);
-                }
+            postData('http://localhost:3000/requests', json)
+            .then(data => {
+                console.log(data);
+                showThanksModal(message.success);
+                statusMesage.remove(); 
+            }).catch(()=> {
+                showThanksModal(message.failure);
+            }).finally(() => {
+                form.reset();
             });
         });
     }
-
-    function modalThanks (message) {
+    
+    function showThanksModal(message) {
         const prevModalDialog = document.querySelector('.modal__dialog');
-
         prevModalDialog.classList.add('hide');
-        showModal();
-
+        openModal();
+        
         const thanksModal = document.createElement('div');
         thanksModal.classList.add('modal__dialog');
-        
         thanksModal.innerHTML = `
-            <div class="modal__content">
-                <div class="modal__close" data-close>×</div>
-                <div class="modal__title">${message}</div>
-            </div>
-        `;
-        
+        <div class="modal__content">
+            <div class="modal__close" data-close>×</div>
+            <div class="modal__title">${message}</div>
+        </div>`;
         document.querySelector('.modal').append(thanksModal);
-        setTimeout(() => {
+        setTimeout(()=> {
             thanksModal.remove();
             prevModalDialog.classList.remove('hide');
-            hiddenModal (); 
+            prevModalDialog.classList.add('show');
+            closeModal();
         }, 2000);
     }
+    // fetch('http://localhost:3000/menu')
+    // .then(data => data.json())
+    // .then(data => {
+    //     console.log(data);
+    // });
+
+    // let s = ['s', 5];
+    // const jsonss = JSON.stringify(Object.fromEntries(Object.entries(s)));
+    // console.log(JSON.parse(jsonss));
+
 });
