@@ -257,14 +257,41 @@ window.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }, 2000);
     }
-    // fetch('http://localhost:3000/menu')
-    // .then(data => data.json())
-    // .then(data => {
-    //     console.log(data);
-    // });
 
-    // let s = ['s', 5];
-    // const jsonss = JSON.stringify(Object.fromEntries(Object.entries(s)));
-    // console.log(JSON.parse(jsonss));
+    // Slider
 
+    const sliders = document.querySelectorAll('.offer__slide'),
+          prev = document.querySelector('.offer__slider-prev'),
+          next = document.querySelector('.offer__slider-next'),
+          total = document.querySelector('#total'),
+          current = document.querySelector('#current');
+    let count = 1;
+        if (sliders.length < 10) {
+            total.textContent = `0${sliders.length}`;
+        }else {
+            total.textContent = sliders.length;
+        }
+
+    function showSlaider (n) {
+        if (n > sliders.length) {
+            count = 1;
+        }
+        if (n < 1) {
+            count = sliders.length;
+        }
+        sliders.forEach(item => {
+            item.style.cssText = "display: none";
+        });
+        sliders[count -1].style.cssText = "display: block";
+    }
+    showSlaider (count);
+
+    prev.addEventListener('click', () => {
+        count--;
+        showSlaider (count);
+    });
+    next.addEventListener('click', () => {
+        count++;
+        showSlaider (count);
+    });
 });
