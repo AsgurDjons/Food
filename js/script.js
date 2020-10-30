@@ -283,6 +283,12 @@ window.addEventListener('DOMContentLoaded', () => {
             item.style.cssText = "display: none";
         });
         sliders[count -1].style.cssText = "display: block";
+
+        if (sliders.length < 10) {
+            current.textContent = `0${count}`;
+        }else {
+            current.textContent = count;
+        }
     }
     showSlaider (count);
 
